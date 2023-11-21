@@ -55,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
                     bundle.putSerializable("obj_staff", staff);
                     intent.putExtras(bundle);
                     startActivity(intent);
+                } else {
+                    Toast.makeText(LoginActivity.this, "Số điện thoại hoặc mật khẩu không chính xác!", Toast.LENGTH_SHORT).show();
                 }
             }
 

@@ -5,11 +5,11 @@
         android:icon="@drawable/baseline_home_16"/>
 
     <item android:id="@+id/you"
-        android:title="You"
+        android:title="Bạn"
         android:icon="@drawable/baseline_person_16"/>
 
     <item android:id="@+id/log_out"
-        android:title="Logout"
+        android:title="Đăng xuất"
         android:icon="@drawable/baseline_exit_to_app_16"/>
 
 </menu>
