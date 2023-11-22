@@ -119,12 +119,19 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 try {
                     String waterMeterId = scanData.getWaterMeterId();
+                    Double lastValue = Double.parseDouble(fragmentHomeBinding.edtLastValue.getText().toString().trim());
                     Double value = Double.parseDouble(fragmentHomeBinding.edtCurrentValue.getText().toString().trim());
+                    if (lastValue > value) {
+                        Toast.makeText(getActivity(), "Dữ liệu không hợp lệ!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     Bundle bundle1 = getArguments();
                     User staff = (User) bundle1.get("obj_staff");
-                    BigInteger recorder;
+                    String recorderName;
+                    BigInteger recorderPhone;
                     if (staff != null) {
-                        recorder = staff.getPhoneNumber();
+                        recorderName = staff.getName();
+                        recorderPhone = staff.getPhoneNumber();
                     } else {
                         Toast.makeText(getActivity(), "Chưa có thông tin người ghi nhận!", Toast.LENGTH_SHORT).show();
                         return;
@@ -132,7 +139,7 @@ public class HomeFragment extends Fragment {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     dateFormat.setTimeZone(TimeZone.getDefault());
                     Date date = dateFormat.parse(fragmentHomeBinding.edtRecordDate.getText().toString());
-                    Record record = new Record(waterMeterId, value, date, recorder);
+                    Record record = new Record(waterMeterId, value, date, recorderName, recorderPhone);
                     Log.e("Record", record.toString());
                     ApiService.apiService.addRecord(record).enqueue(new Callback<String>() {
                         @Override
