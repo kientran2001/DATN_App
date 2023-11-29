@@ -37,11 +37,17 @@ public class LoginActivity extends AppCompatActivity {
 
     private void clickLogin() {
         String phoneString = activityLoginBinding.edtPhoneNumber.getText().toString().trim();
+        if (phoneString.length() == 0) {
+            Toast.makeText(LoginActivity.this, "Nhập SĐT để đăng nhập!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         BigInteger phoneNumber = new BigInteger(phoneString);
         String password = activityLoginBinding.edtPassword.getText().toString().trim();
-
+        if (password.length() == 0) {
+            Toast.makeText(LoginActivity.this, "Nhập mật khẩu để đăng nhập!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         LoginRequest loginRequest = new LoginRequest(phoneNumber, password);
-
         Log.e("loginRequest", loginRequest.toString());
         ApiService.apiService.loginApp(loginRequest).enqueue(new Callback<User>() {
             @Override

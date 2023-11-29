@@ -1,14 +1,27 @@
 package com.example.datnapp.fragment;
 
+import static android.app.Activity.RESULT_OK;
+import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
+
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +37,10 @@ import com.example.datnapp.databinding.FragmentHomeBinding;
 import com.example.datnapp.model.Record;
 import com.example.datnapp.model.ScanData;
 import com.example.datnapp.model.User;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.Text;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.gson.Gson;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
@@ -47,25 +64,21 @@ import retrofit2.Response;
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding fragmentHomeBinding;
     ScanData scanData;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false);
-
         fragmentHomeBinding.btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 scanCode();
             }
         });
-
         fragmentHomeBinding.edtRecordDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,14 +94,12 @@ public class HomeFragment extends Fragment {
                             public void onDateSet(DatePicker view, int year,
                                                   int monthOfYear, int dayOfMonth) {
                                 fragmentHomeBinding.edtRecordDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
-
                             }
                         },
                         year, month, day);
                 datePickerDialog.show();
             }
         });
-
         fragmentHomeBinding.btnGetData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,7 +115,6 @@ public class HomeFragment extends Fragment {
                             Toast.makeText(getActivity(), "Chưa có dữ liệu", Toast.LENGTH_SHORT).show();
                         }
                     }
-
                     @Override
                     public void onFailure(Call<Record> call, Throwable t) {
                         Log.e("throwable", t.toString());
@@ -113,15 +123,25 @@ public class HomeFragment extends Fragment {
                 });
             }
         });
-
         fragmentHomeBinding.btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
+                    if (scanData == null) {
+                        Toast.makeText(getActivity(), "Chưa có dữ liệu đồng hồ!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     String waterMeterId = scanData.getWaterMeterId();
-                    Double lastValue = Double.parseDouble(fragmentHomeBinding.edtLastValue.getText().toString().trim());
-                    Double value = Double.parseDouble(fragmentHomeBinding.edtCurrentValue.getText().toString().trim());
+                    String lastValueStr = fragmentHomeBinding.edtLastValue.getText().toString().trim();
+                    String valueStr = fragmentHomeBinding.edtCurrentValue.getText().toString().trim();
+                    if (lastValueStr.length() == 0 || valueStr.length() == 0) {
+                        Toast.makeText(getActivity(), "Chưa nhập số liệu đồng hồ!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Double lastValue = Double.parseDouble(lastValueStr);
+                    Double value = Double.parseDouble(valueStr);
                     if (lastValue > value) {
+                        fragmentHomeBinding.edtCurrentValue.setTextColor(Color.RED);
                         Toast.makeText(getActivity(), "Dữ liệu không hợp lệ!", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -138,7 +158,12 @@ public class HomeFragment extends Fragment {
                     }
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     dateFormat.setTimeZone(TimeZone.getDefault());
-                    Date date = dateFormat.parse(fragmentHomeBinding.edtRecordDate.getText().toString());
+                    String strDate = fragmentHomeBinding.edtRecordDate.getText().toString();
+                    if (strDate.length() == 0) {
+                        Toast.makeText(getActivity(), "Vui lòng chọn ngày ghi nhận!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Date date = dateFormat.parse(strDate);
                     Record record = new Record(waterMeterId, value, date, recorderName, recorderPhone);
                     Log.e("Record", record.toString());
                     ApiService.apiService.addRecord(record).enqueue(new Callback<String>() {
@@ -163,13 +188,24 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
-
+        fragmentHomeBinding.btnCapture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cameraIntent = new Intent(ACTION_IMAGE_CAPTURE);
+                if (ActivityCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.CAMERA}, 1);
+                    return;
+                }
+                capLauncher.launch(cameraIntent);
+            }
+        });
         return fragmentHomeBinding.getRoot();
     }
-
     public ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (isAdded() && result.getContents() != null) {
-            Log.d("Scan", "Scan: " + result.getContents());
+            Log.e("Scan", "Scan: " + result.getContents());
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Thông tin đồng hồ");
@@ -197,7 +233,6 @@ public class HomeFragment extends Fragment {
             }
         }
     });
-
     private void scanCode() {
         if (getActivity() != null) {
             ScanOptions options = new ScanOptions();
@@ -208,4 +243,39 @@ public class HomeFragment extends Fragment {
             barLauncher.launch(options);
         }
     }
+    private ActivityResultLauncher<Intent> capLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult o) {
+                    if (o.getResultCode() == RESULT_OK) {
+                        try {
+                            Bitmap photo = (Bitmap) o.getData().getExtras().get("data");
+                            fragmentHomeBinding.imgCapture.setImageBitmap(photo);
+
+                            // Nhận dạng chữ/ số
+                            TextRecognizer textRecognizer = new TextRecognizer.Builder(getContext()).build();
+                            if (!textRecognizer.isOperational()) {
+                                Toast.makeText(getActivity(), "Nhận dạng ảnh không khả dụng!", Toast.LENGTH_SHORT).show();
+                                fragmentHomeBinding.tvTest.setText("Nhận dạng ảnh không khả dụng!");
+                                fragmentHomeBinding.tvTest.setTextColor(Color.RED);
+                            } else {
+                                Frame frame = new Frame.Builder().setBitmap(photo).build();
+                                SparseArray<TextBlock> textBlocks = textRecognizer.detect(frame);
+                                String detectResult = "";
+                                for (int index = 0; index < textBlocks.size(); index++) {
+                                    TextBlock textBlock = textBlocks.valueAt(index);
+                                    for (Text line : textBlock.getComponents()) {
+                                        String text = line.getValue();
+                                        detectResult += text + "\n";
+                                    }
+                                }
+                                fragmentHomeBinding.tvTest.setText(detectResult);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+    );
 }

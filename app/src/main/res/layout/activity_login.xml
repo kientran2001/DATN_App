@@ -30,8 +30,10 @@
             android:id="@+id/edt_phone_number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/custom_edt"
             android:hint="Số điện thoại"
             android:layout_marginTop="4dp"
+            android:paddingStart="4dp"
             android:inputType="phone"
             android:textSize="16sp" />
 
@@ -39,8 +41,10 @@
             android:id="@+id/edt_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/custom_edt"
             android:hint="Mật khẩu"
             android:layout_marginTop="4dp"
+            android:paddingStart="4dp"
             android:inputType="textPassword"
             android:textSize="16sp" />
 

@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 import android.window.OnBackInvokedDispatcher;
 
+import com.example.datnapp.databinding.ActivityLoginBinding;
 import com.example.datnapp.databinding.ActivityMainBinding;
 import com.example.datnapp.fragment.HomeFragment;
 import com.example.datnapp.fragment.YouFragment;
@@ -35,11 +36,6 @@ public class MainActivity extends AppCompatActivity {
             staff = (User) bundleReceive.get("obj_staff");
 //            Log.e("staff", staff.toString());
         }
-
-//        YouFragment youFragment = new YouFragment();
-//        youFragment.setArguments(bundleReceive);
-//        replaceFragment(youFragment);
-//        activityMainBinding.bottomNav.getMenu().findItem(R.id.you).setChecked(true);
 
         YouFragment youFragment = new YouFragment();
         youFragment.setArguments(bundleReceive);
@@ -64,9 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 myDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-//                        finish();
-                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                        startActivity(intent);
+                        finish();
                     }
                 });
                 myDialog.setNegativeButton("Không", new DialogInterface.OnClickListener() {
