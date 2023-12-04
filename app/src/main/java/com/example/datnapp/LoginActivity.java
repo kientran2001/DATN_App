@@ -36,12 +36,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void clickLogin() {
-        String phoneString = activityLoginBinding.edtPhoneNumber.getText().toString().trim();
-        if (phoneString.length() == 0) {
+        String phoneNumber = activityLoginBinding.edtPhoneNumber.getText().toString().trim();
+        if (phoneNumber.length() == 0) {
             Toast.makeText(LoginActivity.this, "Nhập SĐT để đăng nhập!", Toast.LENGTH_SHORT).show();
             return;
         }
-        BigInteger phoneNumber = new BigInteger(phoneString);
         String password = activityLoginBinding.edtPassword.getText().toString().trim();
         if (password.length() == 0) {
             Toast.makeText(LoginActivity.this, "Nhập mật khẩu để đăng nhập!", Toast.LENGTH_SHORT).show();
@@ -61,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                     bundle.putSerializable("obj_staff", staff);
                     intent.putExtras(bundle);
                     startActivity(intent);
+                    finish();
                 } else {
                     Toast.makeText(LoginActivity.this, "Số điện thoại hoặc mật khẩu không chính xác!", Toast.LENGTH_SHORT).show();
                 }

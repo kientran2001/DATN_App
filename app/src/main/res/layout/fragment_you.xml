@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:layout_marginStart="4dp">
+        android:layout_marginStart="8dp">
 
         <TableRow
             android:layout_width="match_parent"
@@ -28,6 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tên nhân viên:"
+                android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_name"
@@ -47,6 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Số điện thoại:"
+                android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_phone_number"
@@ -65,6 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Email:"
+                android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_email"
@@ -84,6 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Role:"
+                android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_role"

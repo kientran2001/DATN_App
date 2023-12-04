@@ -1,6 +1,5 @@
 package com.example.datnapp.model;
 
-import java.math.BigInteger;
 import java.util.Date;
 
 public class Record {
@@ -8,14 +7,16 @@ public class Record {
     private Double value;
     private Date date;
     private String recorderName;
-    private BigInteger recorderPhone;
+    private String recorderPhone;
+    private String image;
 
-    public Record(String waterMeterId, Double value, Date date, String recorderName, BigInteger recorderPhone) {
+    public Record(String waterMeterId, Double value, Date date, String recorderName, String recorderPhone, String image) {
         this.waterMeterId = waterMeterId;
         this.value = value;
         this.date = date;
         this.recorderName = recorderName;
         this.recorderPhone = recorderPhone;
+        this.image = image;
     }
 
     public String getWaterMeterId() {
@@ -50,12 +51,20 @@ public class Record {
         this.recorderName = recorderName;
     }
 
-    public BigInteger getRecorderPhone() {
+    public String getRecorderPhone() {
         return recorderPhone;
     }
 
-    public void setRecorderPhone(BigInteger recorderPhone) {
+    public void setRecorderPhone(String recorderPhone) {
         this.recorderPhone = recorderPhone;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     @Override
@@ -65,7 +74,8 @@ public class Record {
                 ", value=" + value +
                 ", date=" + date +
                 ", recorderName='" + recorderName + '\'' +
-                ", recorderPhone=" + recorderPhone +
+                ", recorderPhone='" + recorderPhone + '\'' +
+                ", image='" + image + '\'' +
                 '}';
     }
 }

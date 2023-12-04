@@ -1,16 +1,15 @@
 package com.example.datnapp.model;
 
-import java.math.BigInteger;
 
 public class ScanData {
     private String waterMeterId;
     private String name;
-    private BigInteger phoneNumber;
+    private String phoneNumber;
     private String building;
     private String homeCode;
     private String address;
 
-    public ScanData(String waterMeterId, String name, BigInteger phoneNumber, String building, String homeCode, String address) {
+    public ScanData(String waterMeterId, String name, String phoneNumber, String building, String homeCode, String address) {
         this.waterMeterId = waterMeterId;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -35,11 +34,11 @@ public class ScanData {
         this.name = name;
     }
 
-    public BigInteger getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(BigInteger phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 

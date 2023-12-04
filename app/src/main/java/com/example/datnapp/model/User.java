@@ -1,15 +1,14 @@
 package com.example.datnapp.model;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 public class User implements Serializable {
     private String name;
-    private BigInteger phoneNumber;
+    private String phoneNumber;
     private String email;
     private int role;
 
-    public User(String name, BigInteger phoneNumber, String email, int role) {
+    public User(String name, String phoneNumber, String email, int role) {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.email = email;
@@ -24,11 +23,11 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public BigInteger getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(BigInteger phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -52,7 +51,7 @@ public class User implements Serializable {
     public String toString() {
         return "User{" +
                 "name='" + name + '\'' +
-                ", phoneNumber=" + phoneNumber +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 ", email='" + email + '\'' +
                 ", role=" + role +
                 '}';

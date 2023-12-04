@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/home"
-        android:title="Home"
-        android:icon="@drawable/baseline_home_16"/>
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/baseline_home_16"
+        android:title="Home" />
 
-    <item android:id="@+id/you"
-        android:title="Bạn"
-        android:icon="@drawable/baseline_person_16"/>
+    <item
+        android:id="@+id/capture"
+        android:icon="@drawable/baseline_photo_camera_16"
+        android:title="Ảnh" />
 
-    <item android:id="@+id/log_out"
-        android:title="Đăng xuất"
-        android:icon="@drawable/baseline_exit_to_app_16"/>
+    <item
+        android:id="@+id/you"
+        android:icon="@drawable/baseline_person_16"
+        android:title="Bạn" />
+
+    <item
+        android:id="@+id/log_out"
+        android:icon="@drawable/baseline_exit_to_app_16"
+        android:title="Đăng xuất" />
 
 </menu>

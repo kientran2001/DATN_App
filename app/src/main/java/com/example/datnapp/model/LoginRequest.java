@@ -1,21 +1,19 @@
 package com.example.datnapp.model;
 
-import java.math.BigInteger;
-
 public class LoginRequest {
-    private BigInteger phoneNumber;
+    private String phoneNumber;
     private String password;
 
-    public LoginRequest(BigInteger phoneNumber, String password) {
+    public LoginRequest(String phoneNumber, String password) {
         this.phoneNumber = phoneNumber;
         this.password = password;
     }
 
-    public BigInteger getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(BigInteger phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
@@ -30,7 +28,7 @@ public class LoginRequest {
     @Override
     public String toString() {
         return "LoginRequest{" +
-                "phoneNumber=" + phoneNumber +
+                "phoneNumber='" + phoneNumber + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }

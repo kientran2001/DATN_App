@@ -10,53 +10,60 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatCallback;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+
 import com.example.datnapp.ApiService;
 import com.example.datnapp.CaptureAct;
-import com.example.datnapp.LoginActivity;
 import com.example.datnapp.MainActivity;
-import com.example.datnapp.R;
 import com.example.datnapp.databinding.FragmentHomeBinding;
 import com.example.datnapp.model.Record;
 import com.example.datnapp.model.ScanData;
 import com.example.datnapp.model.User;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.text.Text;
-import com.google.android.gms.vision.text.TextBlock;
-import com.google.android.gms.vision.text.TextRecognizer;
+import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.github.dhaval2404.imagepicker.ImagePickerActivity;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
+import kotlin.Unit;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -64,10 +71,14 @@ import retrofit2.Response;
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding fragmentHomeBinding;
     ScanData scanData;
+    Uri imageUri;
+    TextRecognizer textRecognizer;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -111,10 +122,14 @@ public class HomeFragment extends Fragment {
                             Toast.makeText(getActivity(), "Lấy dữ liệu thành công!", Toast.LENGTH_SHORT).show();
                             Record record = response.body();
                             fragmentHomeBinding.edtLastValue.setText(record.getValue().toString());
+                            fragmentHomeBinding.edtCurrentValue.setText("");
                         } else {
                             Toast.makeText(getActivity(), "Chưa có dữ liệu", Toast.LENGTH_SHORT).show();
+                            fragmentHomeBinding.edtLastValue.setText("");
+                            fragmentHomeBinding.edtCurrentValue.setText("");
                         }
                     }
+
                     @Override
                     public void onFailure(Call<Record> call, Throwable t) {
                         Log.e("throwable", t.toString());
@@ -148,7 +163,7 @@ public class HomeFragment extends Fragment {
                     Bundle bundle1 = getArguments();
                     User staff = (User) bundle1.get("obj_staff");
                     String recorderName;
-                    BigInteger recorderPhone;
+                    String recorderPhone;
                     if (staff != null) {
                         recorderName = staff.getName();
                         recorderPhone = staff.getPhoneNumber();
@@ -164,19 +179,19 @@ public class HomeFragment extends Fragment {
                         return;
                     }
                     Date date = dateFormat.parse(strDate);
-                    Record record = new Record(waterMeterId, value, date, recorderName, recorderPhone);
+                    String img = "test_img_record";
+                    Record record = new Record(waterMeterId, value, date, recorderName, recorderPhone, img);
                     Log.e("Record", record.toString());
                     ApiService.apiService.addRecord(record).enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
                             if (response.isSuccessful()) {
                                 Toast.makeText(getActivity(), "Ghi dữ liệu thành công!", Toast.LENGTH_LONG).show();
-                                fragmentHomeBinding.edtLastValue.setText("");
-                                fragmentHomeBinding.edtCurrentValue.setText("");
                             } else {
                                 Toast.makeText(getActivity(), String.valueOf(response.body()), Toast.LENGTH_LONG).show();
                             }
                         }
+
                         @Override
                         public void onFailure(Call<String> call, Throwable t) {
                             Log.e("throwable", t.toString());
@@ -188,21 +203,10 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
-        fragmentHomeBinding.btnCapture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent cameraIntent = new Intent(ACTION_IMAGE_CAPTURE);
-                if (ActivityCompat.checkSelfPermission(getActivity(),
-                        Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.CAMERA}, 1);
-                    return;
-                }
-                capLauncher.launch(cameraIntent);
-            }
-        });
+
         return fragmentHomeBinding.getRoot();
     }
+
     public ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (isAdded() && result.getContents() != null) {
             Log.e("Scan", "Scan: " + result.getContents());
@@ -233,6 +237,7 @@ public class HomeFragment extends Fragment {
             }
         }
     });
+
     private void scanCode() {
         if (getActivity() != null) {
             ScanOptions options = new ScanOptions();
@@ -243,39 +248,6 @@ public class HomeFragment extends Fragment {
             barLauncher.launch(options);
         }
     }
-    private ActivityResultLauncher<Intent> capLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult o) {
-                    if (o.getResultCode() == RESULT_OK) {
-                        try {
-                            Bitmap photo = (Bitmap) o.getData().getExtras().get("data");
-                            fragmentHomeBinding.imgCapture.setImageBitmap(photo);
 
-                            // Nhận dạng chữ/ số
-                            TextRecognizer textRecognizer = new TextRecognizer.Builder(getContext()).build();
-                            if (!textRecognizer.isOperational()) {
-                                Toast.makeText(getActivity(), "Nhận dạng ảnh không khả dụng!", Toast.LENGTH_SHORT).show();
-                                fragmentHomeBinding.tvTest.setText("Nhận dạng ảnh không khả dụng!");
-                                fragmentHomeBinding.tvTest.setTextColor(Color.RED);
-                            } else {
-                                Frame frame = new Frame.Builder().setBitmap(photo).build();
-                                SparseArray<TextBlock> textBlocks = textRecognizer.detect(frame);
-                                String detectResult = "";
-                                for (int index = 0; index < textBlocks.size(); index++) {
-                                    TextBlock textBlock = textBlocks.valueAt(index);
-                                    for (Text line : textBlock.getComponents()) {
-                                        String text = line.getValue();
-                                        detectResult += text + "\n";
-                                    }
-                                }
-                                fragmentHomeBinding.tvTest.setText(detectResult);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-    );
+
 }

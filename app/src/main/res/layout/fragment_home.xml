@@ -11,35 +11,25 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ghi chỉ số đồng hồ"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:textColor="#BD2B2B"
+            android:textStyle="bold"
+            android:textSize="24sp" />
+
         <ImageButton
             android:id="@+id/btn_scan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
+            android:layout_margin="8dp"
             android:background="#00000000"
-            android:src="@drawable/baseline_qr_code_scanner_48" />
-
-        <Button
-            android:id="@+id/btn_get_data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:text="Lấy thông tin đồng hồ"
-            android:textSize="16sp" />
-
-        <ImageButton
-            android:id="@+id/btn_capture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:background="#00000000"
-            android:src="@drawable/camera" />
+            android:src="@drawable/baseline_qr_code_scanner_24" />
 
     </LinearLayout>
 
@@ -51,11 +41,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:orientation="vertical">
 
             <TableLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp">
 
                 <TableRow
                     android:layout_width="match_parent"
@@ -65,6 +57,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ID đồng hồ"
+                        android:textStyle="bold"
                         android:textSize="14sp" />
 
                     <EditText
@@ -87,6 +80,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Tên người dùng"
+                        android:textStyle="bold"
                         android:textSize="14sp" />
 
                     <EditText
@@ -110,6 +104,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Số điện thoại"
+                        android:textStyle="bold"
                         android:textSize="14sp" />
 
                     <EditText
@@ -133,6 +128,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Toà nhà"
+                        android:textStyle="bold"
                         android:textSize="14sp" />
 
                     <EditText
@@ -156,6 +152,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Mã/ Số nhà"
+                        android:textStyle="bold"
                         android:textSize="14sp" />
 
                     <EditText
@@ -179,6 +176,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Địa chỉ"
+                        android:textStyle="bold"
                         android:textSize="14sp" />
 
                     <EditText
@@ -203,6 +201,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Chỉ số cũ"
+                        android:textStyle="bold"
                         android:textSize="14sp" />
 
                     <EditText
@@ -226,6 +225,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Chỉ số hiện tại"
+                        android:textStyle="bold"
                         android:textSize="14sp" />
 
                     <EditText
@@ -249,6 +249,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Ngày ghi nhận"
+                        android:textStyle="bold"
                         android:textSize="14sp" />
 
                     <EditText
@@ -278,24 +279,14 @@
                 android:text="Gửi"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/tv_test"
+            <Button
+                android:id="@+id/btn_get_data"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="4dp"
-                android:hint="Dữ liệu nhận dạng từ ảnh"
-                android:textAlignment="center"
-                android:textSize="14sp" />
-
-            <ImageView
-                android:id="@+id/img_capture"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:src="@drawable/camera" />
+                android:layout_marginBottom="12dp"
+                android:text="Lấy thông tin đồng hồ"
+                android:textSize="16sp" />
 
         </LinearLayout>
     </ScrollView>
