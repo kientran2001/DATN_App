@@ -52,7 +52,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(LoginActivity.this, "Login successfully!", Toast.LENGTH_SHORT).show();
                     User staff = response.body();
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);

@@ -1,14 +1,10 @@
 package com.example.datnapp.fragment;
 
 import static android.app.Activity.RESULT_OK;
-import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
 
-import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,27 +15,20 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatCallback;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.datnapp.ApiService;
-import com.example.datnapp.CaptureAct;
-import com.example.datnapp.MainActivity;
+import com.example.datnapp.SupportClass.CaptureAct;
+import com.example.datnapp.SupportClass.ImageUtil;
 import com.example.datnapp.databinding.FragmentHomeBinding;
 import com.example.datnapp.model.Record;
 import com.example.datnapp.model.ScanData;
 import com.example.datnapp.model.User;
 import com.github.dhaval2404.imagepicker.ImagePicker;
-import com.github.dhaval2404.imagepicker.ImagePickerActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -63,17 +52,15 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import kotlin.Unit;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
-    private FragmentHomeBinding fragmentHomeBinding;
-    ScanData scanData;
-    Uri imageUri;
+    public FragmentHomeBinding fragmentHomeBinding;
+    private ScanData scanData;
     TextRecognizer textRecognizer;
-
+    private Uri imageUri = null;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +71,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fragmentHomeBinding = FragmentHomeBinding.inflate(inflater, container, false);
+        textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         fragmentHomeBinding.btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,10 +126,35 @@ public class HomeFragment extends Fragment {
                 });
             }
         });
+        fragmentHomeBinding.btnCapture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImagePicker.Companion.with(getActivity())
+                        .crop()
+                        .compress(64)         // Final image size will be less than 1 MB (Optional)
+                        .maxResultSize(240, 240)  // Final image resolution will be less than 1080 x 1080 (Optional)
+                        .createIntent(intent -> {
+                            capLauncher.launch(intent);
+                            return null;
+                        });
+            }
+        });
         fragmentHomeBinding.btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
+                    Bundle bundle1 = getArguments();
+                    User staff = (User) bundle1.get("obj_staff");
+                    String recorderName;
+                    String recorderPhone;
+                    if (staff != null) {
+                        recorderName = staff.getName();
+                        recorderPhone = staff.getPhoneNumber();
+                    } else {
+                        Toast.makeText(getActivity(), "Chưa có thông tin người ghi nhận!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     if (scanData == null) {
                         Toast.makeText(getActivity(), "Chưa có dữ liệu đồng hồ!", Toast.LENGTH_SHORT).show();
                         return;
@@ -160,17 +173,6 @@ public class HomeFragment extends Fragment {
                         Toast.makeText(getActivity(), "Dữ liệu không hợp lệ!", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    Bundle bundle1 = getArguments();
-                    User staff = (User) bundle1.get("obj_staff");
-                    String recorderName;
-                    String recorderPhone;
-                    if (staff != null) {
-                        recorderName = staff.getName();
-                        recorderPhone = staff.getPhoneNumber();
-                    } else {
-                        Toast.makeText(getActivity(), "Chưa có thông tin người ghi nhận!", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     dateFormat.setTimeZone(TimeZone.getDefault());
                     String strDate = fragmentHomeBinding.edtRecordDate.getText().toString();
@@ -179,7 +181,15 @@ public class HomeFragment extends Fragment {
                         return;
                     }
                     Date date = dateFormat.parse(strDate);
-                    String img = "test_img_record";
+//                    String img = "test_img_record";
+                    String img = "";
+                    if (imageUri != null) {
+                        img = ImageUtil.convertImageUriToBase64(getActivity(), imageUri);
+                    } else {
+                        Toast.makeText(getActivity(), "Bạn chưa chụp ảnh đồng hồ", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     Record record = new Record(waterMeterId, value, date, recorderName, recorderPhone, img);
                     Log.e("Record", record.toString());
                     ApiService.apiService.addRecord(record).enqueue(new Callback<String>() {
@@ -207,13 +217,52 @@ public class HomeFragment extends Fragment {
         return fragmentHomeBinding.getRoot();
     }
 
+    public ActivityResultLauncher<Intent> capLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                int resultCode = result.getResultCode();
+                Intent data = result.getData();
+
+                if (resultCode == RESULT_OK) {
+                    // Image Uri will not be null for RESULT_OK
+                    Uri fileUri = Objects.requireNonNull(data).getData();
+                    imageUri = fileUri;
+                    fragmentHomeBinding.imgCapture.setImageURI(imageUri);
+                    recognizeText(imageUri);
+                } else if (resultCode == ImagePicker.RESULT_ERROR) {
+                    Toast.makeText(getActivity(), ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Task Cancelled", Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
+    private void recognizeText(Uri imageUri) {
+        if (imageUri != null) {
+            try {
+                InputImage inputImage = InputImage.fromFilePath(getActivity(), imageUri);
+                Task<Text> result = textRecognizer.process(inputImage)
+                        .addOnSuccessListener(new OnSuccessListener<Text>() {
+                            @Override
+                            public void onSuccess(Text text) {
+                                String recognizeText = text.getText();
+                                Toast.makeText(getActivity(), recognizeText, Toast.LENGTH_LONG).show();
+                                fragmentHomeBinding.edtCurrentValue.setText(recognizeText);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getActivity(), e.getMessage().toString(), Toast.LENGTH_LONG).show();
+                            }
+                        });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     public ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (isAdded() && result.getContents() != null) {
             Log.e("Scan", "Scan: " + result.getContents());
-
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Thông tin đồng hồ");
-            builder.setMessage(result.getContents());
+            builder.setTitle("Scan QR thành công");
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -237,7 +286,6 @@ public class HomeFragment extends Fragment {
             }
         }
     });
-
     private void scanCode() {
         if (getActivity() != null) {
             ScanOptions options = new ScanOptions();
@@ -248,6 +296,4 @@ public class HomeFragment extends Fragment {
             barLauncher.launch(options);
         }
     }
-
-
 }

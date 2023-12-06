@@ -1,4 +1,4 @@
-package com.example.datnapp;
+package com.example.datnapp.SupportClass;
 
 import com.journeyapps.barcodescanner.CaptureActivity;
 
