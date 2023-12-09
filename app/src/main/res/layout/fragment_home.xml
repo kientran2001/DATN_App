@@ -209,22 +209,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:layout_marginTop="2dp"
+                        android:layout_marginTop="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/custom_edt_home"
                         android:ems="10"
                         android:inputType="number|numberDecimal"
                         android:paddingStart="4dp" />
-                    <Button
-                        android:id="@+id/btn_get_data"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="2dp"
-                        android:background="@drawable/custom_btn_get_data"
-                        android:backgroundTint="@null"
-                        android:text="Lấy C/S"
-                        android:textColor="@color/white"
-                        android:textSize="14sp" />
+
                 </TableRow>
 
                 <TableRow
@@ -242,9 +233,9 @@
                         android:id="@+id/edt_current_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="4dp"
-                        android:layout_marginTop="2dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_weight="1"
                         android:background="@drawable/custom_edt_home"
                         android:ems="10"
                         android:inputType="number|numberDecimal"
@@ -254,10 +245,12 @@
                         android:id="@+id/btn_capture"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:src="@drawable/baseline_photo_camera_32"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="4dp"
                         android:background="#00000000"
-                        android:layout_gravity="center" />
+                        android:src="@drawable/baseline_photo_camera_32" />
                 </TableRow>
 
                 <TableRow
@@ -302,10 +295,11 @@
 
             <ImageView
                 android:id="@+id/img_capture"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
                 android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
-                android:layout_height="100dp" />
+                android:layout_marginBottom="12dp" />
 
         </LinearLayout>
     </ScrollView>

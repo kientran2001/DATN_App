@@ -7,4 +7,5 @@
     </style>
 
     <style name="Theme.DATNApp" parent="Base.Theme.DATNApp" />
+
 </resources>

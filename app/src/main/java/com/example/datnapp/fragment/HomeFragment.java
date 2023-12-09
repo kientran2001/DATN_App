@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment {
     private ScanData scanData;
     TextRecognizer textRecognizer;
     private Uri imageUri = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,40 +100,14 @@ public class HomeFragment extends Fragment {
                 datePickerDialog.show();
             }
         });
-        fragmentHomeBinding.btnGetData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String waterMeterId = fragmentHomeBinding.edtWaterMeterId.getText().toString().trim();
-                ApiService.apiService.recentRecord(waterMeterId).enqueue(new Callback<Record>() {
-                    @Override
-                    public void onResponse(Call<Record> call, Response<Record> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(getActivity(), "Lấy dữ liệu thành công!", Toast.LENGTH_SHORT).show();
-                            Record record = response.body();
-                            fragmentHomeBinding.edtLastValue.setText(record.getValue().toString());
-                            fragmentHomeBinding.edtCurrentValue.setText("");
-                        } else {
-                            Toast.makeText(getActivity(), "Chưa có dữ liệu", Toast.LENGTH_SHORT).show();
-                            fragmentHomeBinding.edtLastValue.setText("");
-                            fragmentHomeBinding.edtCurrentValue.setText("");
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Record> call, Throwable t) {
-                        Log.e("throwable", t.toString());
-                        Toast.makeText(getActivity(), "Lấy dữ liệu thất bại!", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
         fragmentHomeBinding.btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ImagePicker.Companion.with(getActivity())
-                        .crop()
-                        .compress(64)         // Final image size will be less than 1 MB (Optional)
-                        .maxResultSize(240, 240)  // Final image resolution will be less than 1080 x 1080 (Optional)
+                        .cameraOnly()
+                        .crop(16f, 9f)
+                        .compress(128)         // Final image size will be less than 1 MB (Optional)
+                        .maxResultSize(360, 360)  // Final image resolution will be less than 1080 x 1080 (Optional)
                         .createIntent(intent -> {
                             capLauncher.launch(intent);
                             return null;
@@ -235,6 +210,7 @@ public class HomeFragment extends Fragment {
                 }
             }
     );
+
     private void recognizeText(Uri imageUri) {
         if (imageUri != null) {
             try {
@@ -258,17 +234,10 @@ public class HomeFragment extends Fragment {
             }
         }
     }
+
     public ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (isAdded() && result.getContents() != null) {
             Log.e("Scan", "Scan: " + result.getContents());
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Scan QR thành công");
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            }).show();
 
             try {
                 JSONObject obj = new JSONObject(result.getContents());
@@ -284,8 +253,10 @@ public class HomeFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            getData();
         }
     });
+
     private void scanCode() {
         if (getActivity() != null) {
             ScanOptions options = new ScanOptions();
@@ -295,5 +266,30 @@ public class HomeFragment extends Fragment {
             options.setCaptureActivity(CaptureAct.class);
             barLauncher.launch(options);
         }
+    }
+
+    private void getData() {
+        String waterMeterId = fragmentHomeBinding.edtWaterMeterId.getText().toString().trim();
+        ApiService.apiService.recentRecord(waterMeterId).enqueue(new Callback<Record>() {
+            @Override
+            public void onResponse(Call<Record> call, Response<Record> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getActivity(), "Lấy dữ liệu đồng hồ thành công!", Toast.LENGTH_LONG).show();
+                    Record record = response.body();
+                    fragmentHomeBinding.edtLastValue.setText(record.getValue().toString());
+                    fragmentHomeBinding.edtCurrentValue.setText("");
+                } else {
+                    Toast.makeText(getActivity(), "Chưa có chỉ số cũ", Toast.LENGTH_LONG).show();
+                    fragmentHomeBinding.edtLastValue.setText("");
+                    fragmentHomeBinding.edtCurrentValue.setText("");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Record> call, Throwable t) {
+                Log.e("throwable", t.toString());
+                Toast.makeText(getActivity(), "Lấy dữ liệu bản ghi thất bại!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
