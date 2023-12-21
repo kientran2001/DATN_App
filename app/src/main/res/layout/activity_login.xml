@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_margin="8dp"
-    android:background="@drawable/login_background"
+    android:background="@drawable/login_background2"
     tools:context=".LoginActivity">
 
     <TextView
@@ -16,7 +16,7 @@
         android:layout_marginTop="100dp"
         android:text="ĐĂNG NHẬP"
         android:textColor="@android:color/black"
-        android:textSize="36sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         android:textAlignment="center" />
 
@@ -53,13 +53,13 @@
 
         <Button
             android:id="@+id/btn_login"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/custom_btn_login"
             android:backgroundTint="@null"
-            android:padding="10dp"
+            android:padding="12dp"
             android:text="ĐĂNG NHẬP"
             android:textStyle="bold"
             android:textColor="@color/white"
