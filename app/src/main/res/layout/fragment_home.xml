@@ -218,6 +218,34 @@
 
                 </TableRow>
 
+            </TableLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <androidx.camera.view.PreviewView
+                    android:id="@+id/previewView"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp" />
+
+                <EditText
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/custom_bounding_box" />
+            </RelativeLayout>
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp">
+
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -233,7 +261,7 @@
                         android:id="@+id/edt_current_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="8dp"
                         android:layout_marginTop="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/custom_edt_home"
@@ -246,9 +274,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="2dp"
                         android:layout_marginTop="4dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="6dp"
                         android:background="#00000000"
                         android:src="@drawable/baseline_photo_camera_32" />
                 </TableRow>
@@ -268,7 +296,7 @@
                         android:id="@+id/edt_record_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="8dp"
                         android:layout_marginTop="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/custom_edt_home"
