@@ -1,9 +1,11 @@
 package com.example.datnapp.fragment;
 
+import static android.app.Activity.RESULT_OK;
 import static com.example.datnapp.SupportClass.ImageUtil.bitmapToUri;
 import static com.example.datnapp.SupportClass.ImageUtil.convertImageToBitmap;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -16,6 +18,7 @@ import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
@@ -35,6 +38,7 @@ import com.example.datnapp.databinding.FragmentHomeBinding;
 import com.example.datnapp.model.Record;
 import com.example.datnapp.model.ScanData;
 import com.example.datnapp.model.User;
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -56,6 +60,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
@@ -119,10 +124,24 @@ public class HomeFragment extends Fragment {
                 datePickerDialog.show();
             }
         });
-        fragmentHomeBinding.btnCapture.setOnClickListener(new View.OnClickListener() {
+        fragmentHomeBinding.btnCameraX.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 captureImage();
+            }
+        });
+
+        fragmentHomeBinding.btnCapture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImagePicker.Companion.with(getActivity())
+                        .crop(3, 1)             // custom ratio
+                        .compress(128)         // Final image size will be less than 1 MB (Optional)
+                        .maxResultSize(360, 360)  // Final image resolution will be less than 1080 x 1080 (Optional)
+                        .createIntent(intent -> {
+                            capLauncher.launch(intent);
+                            return null;
+                        });
             }
         });
         fragmentHomeBinding.btnSend.setOnClickListener(new View.OnClickListener() {
@@ -203,11 +222,31 @@ public class HomeFragment extends Fragment {
         return fragmentHomeBinding.getRoot();
     }
 
+    public ActivityResultLauncher<Intent> capLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                int resultCode = result.getResultCode();
+                Intent data = result.getData();
+
+                if (resultCode == RESULT_OK) {
+                    // Image Uri will not be null for RESULT_OK
+                    Uri fileUri = Objects.requireNonNull(data).getData();
+                    imageUri = fileUri;
+                    fragmentHomeBinding.imgCapture.setImageURI(imageUri);
+                    recognizeText(imageUri);
+                } else if (resultCode == ImagePicker.RESULT_ERROR) {
+                    Toast.makeText(getActivity(), ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Task Cancelled", Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
+
     private void captureImage() {
         imageCapture.takePicture(ContextCompat.getMainExecutor(getActivity()),
                 new ImageCapture.OnImageCapturedCallback() {
                     @Override
                     public void onCaptureSuccess(@NonNull ImageProxy image) {
+                        Toast.makeText(getActivity(), "Chụp ảnh thành công!", Toast.LENGTH_SHORT).show();
                         // Process the captured image
                         processCapturedImage(image);
                         image.close();
