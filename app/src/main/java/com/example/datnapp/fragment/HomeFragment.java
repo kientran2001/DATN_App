@@ -75,6 +75,7 @@ public class HomeFragment extends Fragment {
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private ImageCapture imageCapture;
     private Uri imageUri = null;
+    private Uri imageToSend = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -262,7 +263,7 @@ public class HomeFragment extends Fragment {
 
     private void processCapturedImage(@NonNull ImageProxy image) {
         Bitmap bitmap = convertImageToBitmap(image);
-        int previewWidth = fragmentHomeBinding.previewView.getWidth();
+        int previewWidth = 2*fragmentHomeBinding.previewView.getWidth();
         int previewHeight = fragmentHomeBinding.previewView.getHeight();
 
         int imageWidth = bitmap.getWidth();
@@ -273,11 +274,11 @@ public class HomeFragment extends Fragment {
 
 
         if (startX < 0 || startY < 0 || startX + previewWidth > imageWidth || startY + previewHeight > imageHeight) {
-            Toast.makeText(getActivity(), "Không lấy được ảnh", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Không lấy được ảnh", Toast.LENGTH_LONG).show();
             return;
         }
         Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, startX, startY, previewWidth, previewHeight);
-        imageUri = bitmapToUri(getActivity(), croppedBitmap, 64, 360, 360);
+        imageUri = bitmapToUri(getActivity(), croppedBitmap, 64, 540, 360);
 
         fragmentHomeBinding.imgCapture.setImageURI(imageUri);
         recognizeText(imageUri);

@@ -74,7 +74,7 @@ public class ImageUtil {
                 // Delete the temporary file after a short delay
                 context.getContentResolver().delete(uriToDelete, null, null);
             }
-        }, 300000); // delay 5 minutes
+        }, 30000); // delay 30s
     }
 
     private static Bitmap resizeBitmap(Bitmap bitmap, int maxWidth, int maxHeight) {
