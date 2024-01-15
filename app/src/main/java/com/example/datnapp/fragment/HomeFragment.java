@@ -136,9 +136,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ImagePicker.Companion.with(getActivity())
-                        .crop(3, 1)             // custom ratio
+                        .crop(4, 1)             // custom ratio
                         .compress(128)         // Final image size will be less than 1 MB (Optional)
-                        .maxResultSize(360, 360)  // Final image resolution will be less than 1080 x 1080 (Optional)
+                        .maxResultSize(480, 480)  // Final image resolution will be less than 1080 x 1080 (Optional)
                         .createIntent(intent -> {
                             capLauncher.launch(intent);
                             return null;
@@ -278,7 +278,7 @@ public class HomeFragment extends Fragment {
             return;
         }
         Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, startX, startY, previewWidth, previewHeight);
-        imageUri = bitmapToUri(getActivity(), croppedBitmap, 64, 540, 360);
+        imageUri = bitmapToUri(getActivity(), croppedBitmap, 64, 480, 480);
 
         fragmentHomeBinding.imgCapture.setImageURI(imageUri);
         recognizeText(imageUri);
